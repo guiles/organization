@@ -1,4 +1,5 @@
 <?php
+//select * from persona where persona_id in (SELECT persona2_id FROM persona p, nodo n WHERE p.persona_id=n.persona_id and n.persona_id=1)
 $enlace =  mysql_connect('localhost', 'guiles', 'guiles');
 if (!$enlace) {
     die('No pudo conectarse: ' . mysql_error());
@@ -21,7 +22,11 @@ while ($row = mysql_fetch_array($result)) {
 <head>
 <script>
 function handle(x){
-	console.debug(x.id);
+	console.debug(x);
+  var el = document.getElementById(x.id);  
+  console.debug(x.firstChild);
+
+  return false;
 	var id = x.id;
 	console.debug(x.childNodes);
 	//Creo el Ajax Request
@@ -54,16 +59,31 @@ function handle(x){
 }
 </script>
 </head>
-
+<?echo "<pre>"?>
 <table>
 <tr><td></td><td>Nombre</td><td>Org.</td></tr>
 <?while ($row = mysql_fetch_array($result)):?>
-<tr onClick="handle(this)" id=<?=$row['persona_id']?>>
+<tr onClick="handle(this)" id="<?=$row['persona_id']?>">
 	<td><?=$row['persona_id']?></td>
 	<td><?=$row['nombre']?></td>
 	<td><?=$row['contacto']?></td>
 </tr>
-<div id=<?=$row['persona_id']?>></div>
+<?
+//select * from persona where persona_id in (SELECT persona2_id FROM persona p, nodo n WHERE p.persona_id=n.persona_id and n.persona_id=1)
+//  $result_rec = mysql_query("select * from persona where persona_id in (SELECT persona2_id FROM persona p, nodo n WHERE p.persona_id=n.persona_id and n.persona_id="+$row['persona_id']+")");
+$query = "select * from persona where persona_id in (SELECT persona2_id FROM persona p, nodo n WHERE p.persona_id=n.persona_id and n.persona_id=".$row['persona_id'].")";
+
+$result_rec = mysql_query($query);
+
+while ($row1 = mysql_fetch_array($result_rec)){?>
+<tr  bgcolor="#FF0000" style="display: none" class="<?=$row['persona_id']?>">
+  <td><?=$row1['persona_id']?></td>
+  <td><?=$row1['nombre']?></td>
+  <td><?=$row1['contacto']?></td>
+</tr>
+
+<?}
+?>
 <?endwhile;?> 
 </table>
 
